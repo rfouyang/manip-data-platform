@@ -1,0 +1,44 @@
+<section data-panel="merge" aria-labelledby="merge-title" hidden>
+  <header class="ui-page-head">
+    <h1 id="merge-title" class="ui-page-title">数据合并</h1>
+    <p class="ui-page-desc">把多个字段一致的 v3.0 数据集合并为一个。</p>
+  </header>
+
+  <div class="ui-card max-w-4xl space-y-6">
+    <section class="space-y-3" aria-labelledby="merge-step-data">
+      <h2 id="merge-step-data" class="ui-step"><span class="ui-step-no">1</span>选择数据集</h2>
+      <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div>
+          <div class="ui-label" id="merge-datasets-label">可选数据集</div>
+          <div id="merge-datasets" class="max-h-72 overflow-y-auto rounded-lg border border-gray-200 px-3 py-1.5 dark:border-neutral-700" role="group" aria-labelledby="merge-datasets-label"></div>
+        </div>
+        <div>
+          <div class="ui-label" id="merge-order-label">合并顺序</div>
+          <ol id="merge-order" class="min-h-12 rounded-lg border border-gray-200 px-3 py-1.5 dark:border-neutral-700" aria-labelledby="merge-order-label"></ol>
+        </div>
+      </div>
+      <p class="ui-hint">按勾选顺序合并，输出 episode 依次排列；如需区分来源，可先给各数据集添加标签。</p>
+    </section>
+
+    <section class="space-y-3" aria-labelledby="merge-step-preview">
+      <h2 id="merge-step-preview" class="ui-step"><span class="ui-step-no">2</span>预检</h2>
+      <div class="flex flex-wrap items-end gap-2">
+        <div class="w-full sm:w-80">
+          <label for="merge-output" class="ui-label">输出名</label>
+          <input id="merge-output" class="ui-input" autocomplete="off" spellcheck="false" />
+        </div>
+        <button id="merge-preview" type="button" class="ui-btn">预检</button>
+      </div>
+      <div id="merge-result" class="space-y-3" aria-live="polite"></div>
+    </section>
+
+    <section class="space-y-3" aria-labelledby="merge-step-submit">
+      <h2 id="merge-step-submit" class="ui-step"><span class="ui-step-no">3</span>生成</h2>
+      <div class="flex flex-wrap items-center gap-3">
+        <button id="merge-submit" type="button" class="ui-btn ui-btn-primary" disabled>生成</button>
+        <span class="ui-hint">预检通过后可生成；结果写入新目录，源数据不变。</span>
+      </div>
+      <div id="merge-task" aria-live="polite"></div>
+    </section>
+  </div>
+</section>

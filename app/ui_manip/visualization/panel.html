@@ -1,0 +1,113 @@
+<section data-panel="visualization" aria-labelledby="visualization-title" hidden>
+  <header class="ui-page-head">
+    <h1 id="visualization-title" class="ui-page-title">数据查看</h1>
+    <p class="ui-page-desc">逐帧查看图像、深度和 state / action 曲线。</p>
+  </header>
+
+  <div class="space-y-4">
+    <div class="ui-card space-y-3">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div>
+          <label for="viz-dataset" class="ui-label">数据集</label>
+          <select id="viz-dataset" class="ui-input"></select>
+        </div>
+        <div>
+          <label for="viz-episode" class="ui-label">Episode</label>
+          <select id="viz-episode" class="ui-input" disabled></select>
+        </div>
+        <div>
+          <label for="viz-camera" class="ui-label">相机</label>
+          <select id="viz-camera" class="ui-input" disabled></select>
+        </div>
+      </div>
+      <div id="viz-message" class="empty:hidden" aria-live="polite"></div>
+    </div>
+
+    <div id="viz-viewer" class="space-y-4" hidden>
+      <div class="ui-card space-y-4">
+        <div id="viz-images" class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <figure class="space-y-2">
+            <figcaption class="flex items-center gap-2 text-sm font-medium">RGB <span id="viz-color-res" class="ui-hint font-normal"></span></figcaption>
+            <div class="overflow-hidden rounded-lg bg-gray-100 dark:bg-neutral-900">
+              <img id="viz-color" alt="RGB 图像" class="block w-full" />
+            </div>
+            <p class="ui-hint">显示用 JPEG，非原始字节。</p>
+          </figure>
+          <figure class="space-y-2">
+            <figcaption class="flex flex-wrap items-center gap-2 text-sm font-medium">
+              深度 <span id="viz-depth-res" class="ui-hint font-normal"></span>
+              <span class="ms-auto flex items-center gap-1.5 font-normal">
+                <input id="viz-depth-min" type="number" min="0" max="65535" class="ui-input w-20 px-2 py-1" aria-label="深度显示下限（毫米）" />
+                <span aria-hidden="true">–</span>
+                <input id="viz-depth-max" type="number" min="1" max="65535" class="ui-input w-20 px-2 py-1" aria-label="深度显示上限（毫米）" />
+                <span class="ui-hint">mm</span>
+                <button id="viz-depth-auto" type="button" class="ui-btn ui-btn-sm">自动</button>
+              </span>
+            </figcaption>
+            <div class="overflow-hidden rounded-lg bg-gray-100 dark:bg-neutral-900">
+              <canvas id="viz-depth" class="block w-full"></canvas>
+            </div>
+            <p id="viz-depth-value" class="ui-hint">悬停查看深度值（毫米）；0 为无效深度，显示为黑色。</p>
+          </figure>
+        </div>
+
+        <div class="space-y-2">
+          <input id="viz-slider" type="range" min="0" value="0" class="w-full accent-blue-600" aria-label="行" />
+          <div id="viz-subtasks" class="flex h-7 overflow-hidden rounded-md border border-gray-200 text-xs dark:border-neutral-700" aria-label="子任务时间线" hidden></div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" class="viz-step ui-btn px-2.5" data-step="image" data-direction="-1" aria-label="上一张图像（Shift + ←）" title="上一张图像（Shift + ←）"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m11 17-5-5 5-5M18 17l-5-5 5-5"></path></svg></button>
+          <button type="button" class="viz-step ui-btn px-2.5" data-step="row" data-direction="-1" aria-label="上一行（←）" title="上一行（←）"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></button>
+          <label class="flex items-center gap-1.5 text-sm">
+            <span class="sr-only">行号</span>
+            <input id="viz-index" type="number" min="0" value="0" class="ui-input w-24 py-1.5 font-mono" />
+            <span id="viz-length" class="ui-hint"></span>
+          </label>
+          <button type="button" class="viz-step ui-btn px-2.5" data-step="row" data-direction="1" aria-label="下一行（→）" title="下一行（→）"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg></button>
+          <button type="button" class="viz-step ui-btn px-2.5" data-step="image" data-direction="1" aria-label="下一张图像（Shift + →）" title="下一张图像（Shift + →）"><svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m13 17 5-5-5-5M6 17l5-5-5-5"></path></svg></button>
+          <span class="mx-1 hidden h-6 w-px bg-gray-200 sm:block dark:bg-neutral-700" aria-hidden="true"></span>
+          <button id="viz-play" type="button" class="ui-btn ui-btn-primary" title="播放 / 暂停（空格）">
+            <span id="viz-play-icon" class="inline-flex" aria-hidden="true"></span><span id="viz-play-label">播放</span>
+          </button>
+          <select id="viz-play-mode" class="ui-input w-auto py-1.5" aria-label="播放步进">
+            <option value="image" selected>按图像</option>
+            <option value="row">按行</option>
+          </select>
+          <select id="viz-play-fps" class="ui-input w-auto py-1.5" aria-label="帧率">
+            <option value="10">10 FPS</option>
+            <option value="15">15 FPS</option>
+            <option value="30" selected>30 FPS</option>
+            <option value="60">60 FPS</option>
+          </select>
+          <label class="flex items-center gap-1.5 text-sm"><input id="viz-play-loop" type="checkbox" class="ui-check" />循环</label>
+          <label class="flex items-center gap-1.5 text-sm"><input id="viz-play-depth" type="checkbox" class="ui-check" checked />播放深度</label>
+          <span id="viz-play-status" class="ui-hint" aria-live="polite"></span>
+        </div>
+        <div id="viz-frame-info" class="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-700 dark:text-neutral-300"></div>
+        <p class="ui-hint"><span id="viz-episode-info"></span> 快捷键：← → 按行，Shift + ← → 按图像，空格播放。</p>
+      </div>
+
+      <div class="ui-card space-y-3">
+        <div class="flex flex-wrap items-center gap-3">
+          <h2 class="ui-section-title">state / action 曲线</h2>
+          <select id="viz-field" class="ui-input w-auto py-1.5" aria-label="字段"></select>
+          <label class="flex items-center gap-1.5 text-sm"><input id="viz-field-pair" type="checkbox" class="ui-check" checked />叠加对应字段</label>
+          <span id="viz-curve-status" class="ui-hint ms-auto"></span>
+        </div>
+        <div id="viz-chart" class="h-80 w-full"></div>
+        <p class="ui-hint">点击曲线跳到对应行；点数过多时抽样显示，下方数值为原值。H5 叠加 master / puppet，LeRobot 叠加 state / action。</p>
+      </div>
+
+      <div class="ui-card space-y-3">
+        <h2 class="ui-section-title">当前帧数值</h2>
+        <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-neutral-700">
+          <table class="ui-table">
+            <thead class="bg-gray-50 dark:bg-neutral-900"><tr><th scope="col" class="ui-th">字段</th><th scope="col" class="ui-th">数值</th></tr></thead>
+            <tbody id="viz-frame-values" class="divide-y divide-gray-200 dark:divide-neutral-700"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

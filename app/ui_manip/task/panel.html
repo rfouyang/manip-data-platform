@@ -1,0 +1,21 @@
+<section data-panel="task" aria-labelledby="task-title" hidden>
+  <header class="ui-page-head">
+    <h1 id="task-title" class="ui-page-title">后台任务</h1>
+    <p class="ui-page-desc">所有生成任务按提交顺序执行，可取消或重试。</p>
+  </header>
+
+  <div class="space-y-4">
+    <div id="task-page-summary"></div>
+
+    <div class="ui-card p-0 md:p-0">
+      <div class="flex flex-wrap items-center gap-3 border-b border-gray-200 px-4 py-3 dark:border-neutral-700">
+        <div id="task-page-filters" class="ui-segment" role="radiogroup" aria-label="状态"></div>
+        <select id="task-page-kind" class="ui-input ms-auto w-auto" aria-label="类型"></select>
+        <button id="task-page-refresh" type="button" class="ui-btn">刷新</button>
+      </div>
+      <div id="task-page-message" class="px-4 pt-3 empty:hidden" aria-live="polite"></div>
+      <div id="task-page-list" class="overflow-x-auto"></div>
+    </div>
+    <p class="ui-hint">任务失败、取消或中断时不发布输出，临时文件自动清理；重试会新建一条记录。</p>
+  </div>
+</section>

@@ -1,0 +1,53 @@
+<section data-panel="conversion" aria-labelledby="conversion-title" hidden>
+  <header class="ui-page-head">
+    <h1 id="conversion-title" class="ui-page-title">格式转换</h1>
+    <p class="ui-page-desc">在 H5、LeRobot v2.1 和 v3.0 之间转换，生成新数据集。</p>
+  </header>
+
+  <div class="ui-card max-w-4xl space-y-6">
+    <section class="space-y-3" aria-labelledby="conv-step-data">
+      <h2 id="conv-step-data" class="ui-step"><span class="ui-step-no">1</span>选择数据</h2>
+      <div class="max-w-md">
+        <label for="conv-dataset" class="ui-label">数据集</label>
+        <select id="conv-dataset" class="ui-input"></select>
+      </div>
+    </section>
+
+    <section class="space-y-3" aria-labelledby="conv-step-target">
+      <h2 id="conv-step-target" class="ui-step"><span class="ui-step-no">2</span>目标格式</h2>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div>
+          <label for="conv-target" class="ui-label">转换为</label>
+          <select id="conv-target" class="ui-input"></select>
+        </div>
+        <div id="conv-scope">
+          <label for="conv-max-episodes" class="ui-label">episode 数</label>
+          <input id="conv-max-episodes" class="ui-input" type="number" min="1" placeholder="全部" />
+        </div>
+      </div>
+      <p id="conv-target-hint" class="ui-hint"></p>
+    </section>
+
+    <section class="space-y-3" aria-labelledby="conv-step-preview">
+      <h2 id="conv-step-preview" class="ui-step"><span class="ui-step-no">3</span>预检</h2>
+      <div class="flex flex-wrap items-end gap-2">
+        <div class="w-full sm:w-80">
+          <label for="conv-output" class="ui-label">输出名</label>
+          <input id="conv-output" class="ui-input" autocomplete="off" spellcheck="false" />
+        </div>
+        <button id="conv-preview" type="button" class="ui-btn">预检</button>
+      </div>
+      <div id="conv-result" class="space-y-3" aria-live="polite"></div>
+    </section>
+
+    <section class="space-y-3" aria-labelledby="conv-step-submit">
+      <h2 id="conv-step-submit" class="ui-step"><span class="ui-step-no">4</span>生成</h2>
+      <div class="flex flex-wrap items-center gap-3">
+        <button id="conv-submit" type="button" class="ui-btn ui-btn-primary" disabled>生成</button>
+        <button id="conv-frame-count" type="button" class="ui-btn" title="逐个 episode 统计图像数与输出帧数，检查 RGB 与深度是否对齐，不写数据">统计帧数</button>
+        <span class="ui-hint">预检通过后可生成；结果写入新目录，源数据不变。</span>
+      </div>
+      <div id="conv-task" aria-live="polite"></div>
+    </section>
+  </div>
+</section>

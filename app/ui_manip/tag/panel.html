@@ -1,0 +1,66 @@
+<section data-panel="tag" aria-labelledby="tag-title" hidden>
+  <header class="ui-page-head">
+    <h1 id="tag-title" class="ui-page-title">添加标签</h1>
+    <p class="ui-page-desc">给每帧加一列标签：从任务描述提取，或统一填写。</p>
+  </header>
+
+  <div class="ui-card max-w-4xl space-y-6">
+    <section class="space-y-3" aria-labelledby="tag-step-data">
+      <h2 id="tag-step-data" class="ui-step"><span class="ui-step-no">1</span>选择数据</h2>
+      <div class="max-w-md">
+        <label for="tag-dataset" class="ui-label">数据集</label>
+        <select id="tag-dataset" class="ui-input"></select>
+        <p id="tag-dataset-info" class="ui-hint mt-1.5">只列出 LeRobot v3.0 数据集。</p>
+      </div>
+      <div id="tag-tasks"></div>
+    </section>
+
+    <section class="space-y-3" aria-labelledby="tag-step-settings">
+      <h2 id="tag-step-settings" class="ui-step"><span class="ui-step-no">2</span>设置标签</h2>
+      <div class="ui-segment" role="radiogroup" aria-label="取值方式">
+        <label class="ui-segment-item"><input type="radio" name="tag-mode" value="regex" class="sr-only" checked />从任务描述提取</label>
+        <label class="ui-segment-item"><input type="radio" name="tag-mode" value="constant" class="sr-only" />统一填写</label>
+      </div>
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div>
+          <label for="tag-column" class="ui-label">列名</label>
+          <input id="tag-column" class="ui-input" autocomplete="off" spellcheck="false" value="tag" />
+        </div>
+        <div data-tag-mode="constant" hidden>
+          <label for="tag-value" class="ui-label">标签值</label>
+          <input id="tag-value" class="ui-input" autocomplete="off" placeholder="如 lab_batch1" />
+        </div>
+        <div data-tag-mode="regex">
+          <label for="tag-pattern" class="ui-label">正则表达式</label>
+          <input id="tag-pattern" class="ui-input font-mono" autocomplete="off" spellcheck="false" placeholder="如 (?i)pick up the (\w+) cup" aria-describedby="tag-pattern-hint" />
+          <p id="tag-pattern-hint" class="ui-hint mt-1.5">有捕获组时取第 1 组；加 (?i) 忽略大小写。</p>
+        </div>
+        <div data-tag-mode="regex">
+          <label for="tag-default" class="ui-label">默认值</label>
+          <input id="tag-default" class="ui-input" autocomplete="off" placeholder="未匹配时使用，留空为空值" />
+        </div>
+      </div>
+    </section>
+
+    <section class="space-y-3" aria-labelledby="tag-step-preview">
+      <h2 id="tag-step-preview" class="ui-step"><span class="ui-step-no">3</span>预检</h2>
+      <div class="flex flex-wrap items-end gap-2">
+        <div class="w-full sm:w-80">
+          <label for="tag-output" class="ui-label">输出名</label>
+          <input id="tag-output" class="ui-input" autocomplete="off" spellcheck="false" />
+        </div>
+        <button id="tag-preview" type="button" class="ui-btn">预检</button>
+      </div>
+      <div id="tag-result" class="space-y-3" aria-live="polite"></div>
+    </section>
+
+    <section class="space-y-3" aria-labelledby="tag-step-submit">
+      <h2 id="tag-step-submit" class="ui-step"><span class="ui-step-no">4</span>生成</h2>
+      <div class="flex flex-wrap items-center gap-3">
+        <button id="tag-submit" type="button" class="ui-btn ui-btn-primary" disabled>生成</button>
+        <span class="ui-hint">预检通过后可生成；结果写入新目录，源数据不变。</span>
+      </div>
+      <div id="tag-task" aria-live="polite"></div>
+    </section>
+  </div>
+</section>

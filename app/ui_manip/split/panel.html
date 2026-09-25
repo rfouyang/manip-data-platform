@@ -1,0 +1,48 @@
+<section data-panel="split" aria-labelledby="split-title" hidden>
+  <header class="ui-page-head">
+    <h1 id="split-title" class="ui-page-title">数据拆分</h1>
+    <p class="ui-page-desc">按标签、任务描述或编号选出 episode，另存为新数据集。</p>
+  </header>
+
+  <div class="ui-card max-w-4xl space-y-6">
+    <section class="space-y-3" aria-labelledby="split-step-data">
+      <h2 id="split-step-data" class="ui-step"><span class="ui-step-no">1</span>选择数据</h2>
+      <div class="max-w-md">
+        <label for="split-dataset" class="ui-label">数据集</label>
+        <select id="split-dataset" class="ui-input"></select>
+        <p id="split-dataset-info" class="ui-hint mt-1.5">只列出 LeRobot v3.0 数据集。</p>
+      </div>
+    </section>
+
+    <section class="space-y-3" aria-labelledby="split-step-select">
+      <h2 id="split-step-select" class="ui-step"><span class="ui-step-no">2</span>选择 episode</h2>
+      <div class="ui-segment" role="radiogroup" aria-label="选择方式">
+        <label class="ui-segment-item"><input type="radio" name="subset-mode" value="values" class="sr-only" checked />按标签</label>
+        <label class="ui-segment-item"><input type="radio" name="subset-mode" value="tasks" class="sr-only" />按任务描述</label>
+        <label class="ui-segment-item"><input type="radio" name="subset-mode" value="episodes" class="sr-only" />按编号</label>
+      </div>
+      <div id="subset-choices" class="space-y-3"></div>
+    </section>
+
+    <section class="space-y-3" aria-labelledby="split-step-preview">
+      <h2 id="split-step-preview" class="ui-step"><span class="ui-step-no">3</span>预检</h2>
+      <div class="flex flex-wrap items-end gap-2">
+        <div class="w-full sm:w-80">
+          <label for="subset-output" class="ui-label">输出名</label>
+          <input id="subset-output" class="ui-input" autocomplete="off" spellcheck="false" />
+        </div>
+        <button id="subset-preview" type="button" class="ui-btn">预检</button>
+      </div>
+      <div id="subset-result" class="space-y-2" aria-live="polite"></div>
+    </section>
+
+    <section class="space-y-3" aria-labelledby="split-step-submit">
+      <h2 id="split-step-submit" class="ui-step"><span class="ui-step-no">4</span>生成</h2>
+      <div class="flex flex-wrap items-center gap-3">
+        <button id="subset-submit" type="button" class="ui-btn ui-btn-primary" disabled>生成</button>
+        <span class="ui-hint">预检通过后可生成；结果写入新目录，源数据不变。</span>
+      </div>
+      <div id="subset-task" aria-live="polite"></div>
+    </section>
+  </div>
+</section>

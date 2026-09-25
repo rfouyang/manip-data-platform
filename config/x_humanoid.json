@@ -1,0 +1,114 @@
+{
+  "name": "x_humanoid_dual_arm",
+  "confirmed_on": "2026-09-23",
+  "source_format": "h5",
+  "fps": 30,
+  "frame_selection": {
+    "mode": "camera_image_starts",
+    "comment": "数值行约 190 Hz，相机图像每约 6 行更新一次；取每张相机图像的起始行作为一帧，输出约 30 FPS。不重采样数值。"
+  },
+  "action": {
+    "source": "puppet",
+    "offset_frames": 1,
+    "comment": "用户确认（2026-09-23）：action 为下一输出帧（下一张相机图像起始行）的 puppet 关节值，即 action[t] = state[t+1]。master 为遥操作臂数据，不使用。"
+  },
+  "state": {
+    "source": "puppet",
+    "offset_frames": 0,
+    "comment": "用户确认：state 为当前输出帧的 puppet 关节值（机器人本体）。"
+  },
+  "vector": [
+    {
+      "field": "arm_left_position_align",
+      "dims": 7,
+      "unit": "rad",
+      "names": [
+        "left_shoulder_pitch",
+        "left_shoulder_roll",
+        "left_shoulder_yaw",
+        "left_elbow_pitch",
+        "left_wrist_yaw",
+        "left_wrist_pitch",
+        "left_wrist_roll"
+      ],
+      "meaning": "左臂关节位置，含义同 SDK /arm/status MotorStatus.pos（rad），电机 ID 11–17"
+    },
+    {
+      "field": "end_effector_left_position_align",
+      "dims": 1,
+      "unit": "normalized_0_1",
+      "names": [
+        "left_gripper"
+      ],
+      "meaning": "左手张开程度；SDK 灵巧手 position 为手指张开百分比，此处每侧 1 维，0~1"
+    },
+    {
+      "field": "arm_right_position_align",
+      "dims": 7,
+      "unit": "rad",
+      "names": [
+        "right_shoulder_pitch",
+        "right_shoulder_roll",
+        "right_shoulder_yaw",
+        "right_elbow_pitch",
+        "right_wrist_yaw",
+        "right_wrist_pitch",
+        "right_wrist_roll"
+      ],
+      "meaning": "右臂关节位置，含义同 SDK /arm/status MotorStatus.pos（rad），电机 ID 21–27"
+    },
+    {
+      "field": "end_effector_right_position_align",
+      "dims": 1,
+      "unit": "normalized_0_1",
+      "names": [
+        "right_gripper"
+      ],
+      "meaning": "右手张开程度；SDK 灵巧手 position 为手指张开百分比，此处每侧 1 维，0~1"
+    }
+  ],
+  "vector_comment": "拼接顺序：左臂 7 + 左夹爪 1 + 右臂 7 + 右夹爪 1 = 16 维，维度顺序与 H5 中存储顺序一致。关节名称取自 doc/天轶2.0 Pro ROS2 SDK-250926.pdf（1.2 全身关节参数、3.1 MotorName）：左臂电机 ID 11–17、右臂 21–27，依次为肩俯仰、肩翻滚、肩偏航、肘俯仰、腕偏航、腕俯仰、腕翻滚。H5 维度按电机 ID 升序对应，源文件本身不含名称。用户确认 PDF 中的关节限位不准确，不以其校验数据范围。",
+  "units_comment": "关节值含义参考 doc/天轶2.0 Pro ROS2 SDK-250926.pdf：关节位置单位 rad（4.5 双臂关节 MotorStatus.pos），正方向按整机坐标系（X 前、Y 左、Z 上）与右手定则确定（1.3.3）。夹爪为归一化开合度 0~1（实测 0.495~0.998），SDK 灵巧手 position 为张开百分比。深度为毫米（实测非零 400~3300，即 0.4~3.3 m）。",
+  "cameras": {
+    "camera_top": {
+      "rgb_feature": "observation.images.camera_top",
+      "depth_feature": "observation.images.camera_top_depth",
+      "comment": "RGB 写入 LeRobot 视频；深度写入 LeRobot 官方深度 feature（12 位，每级 1 mm）。"
+    }
+  },
+  "depth": {
+    "policy": "lerobot_feature",
+    "unit": "mm",
+    "comment": "只写 LeRobot 官方深度 feature（用户要求 2026-09-23 输出只含 LeRobot 标准文件，取消原定的配套 HDF5）：线性 12 位，0–4095 mm 每级 1 mm，整数毫米无损；超过 4095 mm 截断且不可恢复，逐 episode 截断像素数记录在任务结果中。原始 16 位深度保留在源 H5。"
+  },
+  "task": {
+    "source": "metadata.language_instruction",
+    "allow_override": true
+  },
+  "unmapped": [
+    {
+      "name": "master/*",
+      "reason": "遥操作臂数据，按用户要求不用于 action/state，不写入 LeRobot；原始 H5 不变，可溯源"
+    },
+    {
+      "name": "camera_observations/timestamp",
+      "reason": "只有整数秒，无法恢复亚秒间隔；LeRobot 时间按 frame_index / fps 生成；原始值保留在源 H5"
+    },
+    {
+      "name": "camera_observations/is_intervene、puppet/*/is_intervene",
+      "reason": "干预标记，第一版不写入 LeRobot feature；原始值保留在源 H5"
+    },
+    {
+      "name": "*/end_effector_*_pose_align",
+      "reason": "源数据为空数组，不补零、不写入"
+    },
+    {
+      "name": "puppet/*/timestamp",
+      "reason": "与 camera_observations/timestamp 同为整数秒，不写入；原始值保留在源 H5"
+    }
+  ],
+  "last_frame": {
+    "policy": "drop",
+    "comment": "用户确认（2026-09-23）：每个 episode 最后一帧没有下一帧可作 action，不补值、不复制，明确丢弃；每个 episode 输出帧数 = 相机图像数 - 1。"
+  }
+}

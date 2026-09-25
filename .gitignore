@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.py[cod]
+.env
+.pytest_cache/
+.ruff_cache/
+data/
+output/
+log/
+node_modules/
+app/ui_manip/static/dist/
+# IDE 与本机工具配置（.idea/deployment.xml 含部署地址）
+.idea/
+.claude/
+# 厂商 SDK 文档等第三方 PDF 不放入公开仓库
+doc/*.pdf

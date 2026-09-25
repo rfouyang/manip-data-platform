@@ -1,0 +1,131 @@
+<section data-panel="subtask" aria-labelledby="subtask-title" hidden>
+  <header class="ui-page-head">
+    <h1 id="subtask-title" class="ui-page-title">任务标注</h1>
+    <p class="ui-page-desc">按时间把 episode 切成子任务，也可修改任务描述。修改先存为草稿。</p>
+  </header>
+
+  <div class="space-y-4">
+    <div class="ui-card flex flex-wrap items-end gap-3">
+      <div class="w-full sm:w-72">
+        <label for="subtask-dataset" class="ui-label">数据集</label>
+        <select id="subtask-dataset" class="ui-input"></select>
+      </div>
+      <p id="subtask-counts" class="ui-hint pb-2"></p>
+      <details id="subtask-more" class="relative ms-auto">
+        <summary class="ui-btn list-none">更多操作</summary>
+        <div class="absolute end-0 z-20 mt-2 w-[min(22rem,calc(100vw-2rem))] space-y-4 rounded-xl border border-gray-200 bg-white p-4 shadow-lg dark:border-neutral-700 dark:bg-neutral-800">
+          <div class="flex flex-wrap gap-2">
+            <button id="subtask-export" type="button" class="ui-btn ui-btn-sm">导出 CSV</button>
+            <label class="ui-btn ui-btn-sm cursor-pointer has-focus-visible:ring-2 has-focus-visible:ring-blue-500">导入 CSV / JSON<input id="subtask-import" type="file" accept=".csv,.json" class="sr-only" /></label>
+            <button id="subtask-discard-all" type="button" class="ui-btn ui-btn-sm ui-btn-danger">放弃全部草稿</button>
+          </div>
+          <div class="space-y-2 border-t border-gray-200 pt-3 dark:border-neutral-700">
+            <div class="ui-section-title">批量替换</div>
+            <div>
+              <label for="subtask-find" class="ui-label">查找</label>
+              <input id="subtask-find" class="ui-input" autocomplete="off" spellcheck="false" />
+            </div>
+            <div>
+              <label for="subtask-replace" class="ui-label">替换为</label>
+              <input id="subtask-replace" class="ui-input" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+              <select id="subtask-replace-scope" class="ui-input w-auto" aria-label="替换范围">
+                <option value="subtask">子任务</option><option value="task">任务描述</option><option value="all">两者</option>
+              </select>
+              <label class="flex items-center gap-2 text-sm"><input id="subtask-regex" type="checkbox" class="ui-check" />正则</label>
+              <button id="subtask-replace-button" type="button" class="ui-btn ui-btn-sm ms-auto">全部替换</button>
+            </div>
+            <p class="ui-hint">替换结果存为草稿。</p>
+          </div>
+        </div>
+      </details>
+      <div id="subtask-message" class="w-full empty:hidden" aria-live="polite"></div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-[15rem_minmax(0,1fr)]">
+      <div class="ui-card p-0 md:p-0">
+        <div class="border-b border-gray-200 px-4 py-2.5 ui-section-title dark:border-neutral-700">Episode</div>
+        <div id="subtask-episodes" class="max-h-64 overflow-y-auto lg:max-h-[42rem]"></div>
+      </div>
+
+      <div class="ui-card min-w-0">
+        <div id="subtask-empty" class="rounded-lg border border-dashed border-gray-300 px-3 py-10 text-center text-sm text-gray-500 dark:border-neutral-600 dark:text-neutral-400">选择左侧的 episode 开始标注。</div>
+        <div id="subtask-editor" class="space-y-4" hidden>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 id="subtask-episode-title" class="text-base font-semibold text-gray-800 dark:text-white"></h2>
+            <select id="subtask-camera" class="ui-input w-auto" aria-label="相机"></select>
+          </div>
+          <div class="grid grid-cols-1 gap-4 xl:grid-cols-2">
+            <div class="grid aspect-[4/3] place-items-center overflow-hidden rounded-lg bg-gray-100 dark:bg-neutral-900">
+              <img id="subtask-image" alt="当前帧" class="max-h-full max-w-full object-contain" />
+            </div>
+            <div class="space-y-4">
+              <div id="subtask-tasks" class="space-y-3"></div>
+              <div id="subtask-current" class="rounded-lg bg-gray-50 px-3 py-2 text-sm dark:bg-neutral-900" aria-live="polite"></div>
+              <div id="subtask-common" class="flex flex-wrap items-center gap-2" aria-label="常用子任务"></div>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <input id="subtask-slider" type="range" min="0" value="0" class="w-full accent-blue-600" aria-label="帧" />
+            <div id="subtask-timeline" class="flex h-8 overflow-hidden rounded-md border border-gray-200 text-xs dark:border-neutral-700" aria-label="子任务时间线"></div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="subtask-split" type="button" class="ui-btn">在此帧切分</button>
+            <button id="subtask-save" type="button" class="ui-btn ui-btn-primary">保存草稿</button>
+            <button id="subtask-discard" type="button" class="ui-btn ui-btn-danger">放弃草稿</button>
+            <span class="ui-hint">← → 逐帧，Shift 加 10 帧；S 切分；1–9 填入常用子任务。</span>
+          </div>
+          <div id="subtask-editor-message" class="empty:hidden" aria-live="polite"></div>
+          <div id="subtask-segments"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ui-card max-w-4xl space-y-4">
+      <div class="ui-segment" role="radiogroup" aria-label="生成方式">
+        <label class="ui-segment-item"><input type="radio" name="subtask-output-mode" value="write" class="sr-only" checked />生成新数据集</label>
+        <label class="ui-segment-item"><input type="radio" name="subtask-output-mode" value="task" class="sr-only" />转为逐帧任务</label>
+      </div>
+
+      <div data-subtask-output="write" class="space-y-3">
+        <p class="ui-hint">把全部草稿写入新数据集（官方语言标注格式），未修改的内容原样保留。</p>
+        <div class="flex flex-wrap items-end gap-2">
+          <div class="w-full sm:w-80">
+            <label for="subtask-write-output" class="ui-label">输出名</label>
+            <input id="subtask-write-output" class="ui-input" autocomplete="off" spellcheck="false" />
+          </div>
+          <button id="subtask-write-preview" type="button" class="ui-btn">预检</button>
+          <button id="subtask-write-submit" type="button" class="ui-btn ui-btn-primary" disabled>生成</button>
+        </div>
+        <div id="subtask-write-result" class="space-y-3" aria-live="polite"></div>
+        <div id="subtask-write-task" aria-live="polite"></div>
+      </div>
+
+      <div data-subtask-output="task" class="space-y-3" hidden>
+        <p class="ui-hint">每帧的任务描述改为当前子任务，供只读任务描述的模型训练；可直接使用未生成的草稿。</p>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <label for="subtask-template" class="ui-label">模板</label>
+            <input id="subtask-template" class="ui-input font-mono" autocomplete="off" spellcheck="false" value="{subtask}" aria-describedby="subtask-template-hint" />
+            <p id="subtask-template-hint" class="ui-hint mt-1.5">{task} 为整体描述，{subtask} 为子任务。</p>
+          </div>
+          <label class="flex items-center gap-2 self-center text-sm"><input id="subtask-keep-language" type="checkbox" class="ui-check" checked />保留语言标注列</label>
+        </div>
+        <div class="flex flex-wrap items-end gap-2">
+          <div class="w-full sm:w-80">
+            <label for="subtask-task-output" class="ui-label">输出名</label>
+            <input id="subtask-task-output" class="ui-input" autocomplete="off" spellcheck="false" />
+          </div>
+          <button id="subtask-task-preview" type="button" class="ui-btn">预检</button>
+          <button id="subtask-task-submit" type="button" class="ui-btn ui-btn-primary" disabled>生成</button>
+        </div>
+        <div id="subtask-task-result" class="space-y-3" aria-live="polite"></div>
+        <div id="subtask-task-task" aria-live="polite"></div>
+      </div>
+      <p class="ui-hint">结果写入新目录，源数据不变。</p>
+    </div>
+  </div>
+  <div id="subtask-suggest" role="listbox" aria-label="子任务建议" hidden
+    class="fixed z-50 max-h-64 overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-800"></div>
+</section>

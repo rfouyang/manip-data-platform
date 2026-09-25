@@ -1,0 +1,8 @@
+[hidden] {
+  display: none !important;
+}
+
+button,
+label {
+  -webkit-tap-highlight-color: transparent;
+}
