@@ -57,6 +57,7 @@ uv run pytest
 - `util/storage_helper.py`：SQLite 登记存储。
 - `util/h5_helper.py`：H5 episode 发现与只读访问（数值切片、RGB/深度按帧解码）。其余 helper 按后续步骤实现。
 - `config/settings.py`：运行配置。
+- `tools/robomind_batch_convert.py`：RoboMIND 2.0 天轶任务分批转换（每批约 10 GB H5 → v3 → 删 H5 → 合并），本地放不下整个任务的原始数据时使用。
 - 代码约定见 [AGENTS.md](AGENTS.md)，计划见 [doc/plan.md](doc/plan.md)，进度见 [doc/current_state.md](doc/current_state.md)。
 
 每一步先自检，再由用户检查；用户明确回复 OK 后才进入下一步。
